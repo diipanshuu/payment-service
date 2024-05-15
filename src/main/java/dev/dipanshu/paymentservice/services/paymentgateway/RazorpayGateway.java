@@ -1,14 +1,16 @@
 package dev.dipanshu.paymentservice.services.paymentgateway;
 
 import com.razorpay.PaymentLink;
+import dev.dipanshu.paymentservice.utils.EpochTimestampGenerator;
+import dev.dipanshu.paymentservice.utils.UniqueIdGenerator;
 import org.springframework.stereotype.Service;
 import org.json.JSONObject;
-import com.razorpay.Payment;
 import com.razorpay.RazorpayClient;
 import com.razorpay.RazorpayException;
 
 @Service
 public class RazorpayGateway implements PaymentGateway {
+
     @Override
     public String generatePaymentLink() {
 
@@ -23,8 +25,8 @@ public class RazorpayGateway implements PaymentGateway {
         paymentLinkRequest.put("currency", "INR");
         paymentLinkRequest.put("accept_partial", true);
         paymentLinkRequest.put("first_min_partial_amount", 100);
-        paymentLinkRequest.put("expire_by", 1715149604);
-        paymentLinkRequest.put("reference_id", "10");
+        paymentLinkRequest.put("expire_by", EpochTimestampGenerator.generateEpochTimestamp());
+        paymentLinkRequest.put("reference_id", UniqueIdGenerator.generateUniqueId());
         paymentLinkRequest.put("description", "Payment for policy no #23456");
 
         JSONObject customer = new JSONObject();
@@ -52,6 +54,10 @@ public class RazorpayGateway implements PaymentGateway {
             throw new RuntimeException(e);
         }
 
-        return payment.toString();
+        // Will return complete JSONObject
+        // return payment.toString();
+
+        // Will return just the payment link
+        return payment.get("short_url");
     }
 }
